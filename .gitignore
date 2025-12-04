@@ -52,3 +52,10 @@ logs/
 htmlcov/
 .coverage
 .coverage.*
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+*.pid
+*.pyc
+__pycache__/

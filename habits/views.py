@@ -28,7 +28,7 @@ class HabitViewSet(viewsets.ModelViewSet):
     filterset_fields = ["is_pleasant", "is_public", "frequency"]
 
     def get_permissions(self):
-        """Разные permissions для разных действий"""
+        """Разные разрешения для разных действий"""
         if self.action == "create":
             permission_classes = [permissions.IsAuthenticated]
         elif self.action in ["list", "retrieve"]:

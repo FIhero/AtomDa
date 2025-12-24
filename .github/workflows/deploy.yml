@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DB_HOST: db
+      DB_HOST: localhost
       DB_PORT: 5432
       DB_NAME: AtomDa
       DB_USER: postgres

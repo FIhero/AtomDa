@@ -63,7 +63,7 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker-compose -f docker-compose.prod.yml build
+          docker-compose -f docker-compose.yml build
 
   deploy:
     needs: build

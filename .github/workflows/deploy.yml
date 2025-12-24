@@ -73,7 +73,7 @@ jobs:
       - name: Copy Docker Compose files to server
         run: |
           scp -i private_key \
-            docker-compose.prod.yml \
+            docker-compose.yml \
             Dockerfile \
             requirements.txt \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.DEPLOY_DIR }}/

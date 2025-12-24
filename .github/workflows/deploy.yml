@@ -58,10 +58,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v3
-        with:
-          docker-compose: true
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v3
 
       - name: Build Docker images
         run: |

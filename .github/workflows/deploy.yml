@@ -58,12 +58,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v3
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v3
+
+      - name: Install Docker Compose (через apt)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin
+          docker compose version  # Проверяем
 
       - name: Build Docker images
         run: |
-          docker-compose -f docker-compose.yml build
+          docker compose -f docker-compose.yml build
 
   deploy:
     needs: build

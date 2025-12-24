@@ -13,7 +13,7 @@ jobs:
     env:
       DB_HOST: localhost
       DB_PORT: 5432
-      DB_NAME: postgres
+      DB_NAME: AtomDa
       DB_USER: postgres
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
@@ -21,6 +21,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
+          POSTGRES_DB: AtomDa
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
         options: >-
           --health-cmd pg_isready

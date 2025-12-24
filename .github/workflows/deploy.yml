@@ -1,5 +1,3 @@
-name: Test and Deploy
-
 on:
   push:
     branches: [ main, master, develop ]
@@ -51,11 +49,12 @@ jobs:
       run: echo "Все тесты прошли успешно!"
 
   deploy:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Setup SSH
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key

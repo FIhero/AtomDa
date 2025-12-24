@@ -1,0 +1,92 @@
+name: Test and Deploy
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run Django tests
+      run: |
+        python manage.py test --noinput
+
+    - name: Test passed
+      run: echo "Все тесты прошли успешно!"
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment directory on server
+        run: |
+          ssh -i private_key ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            mkdir -p ${{ secrets.DEPLOY_DIR }}
+          "
+
+      - name: Copy Docker Compose files to server
+        run: |
+          scp -i private_key \
+            docker-compose.prod.yml \
+            Dockerfile \
+            requirements.txt \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.DEPLOY_DIR }}/
+
+      - name: Deploy with Docker Compose
+        run: |
+          ssh -i private_key ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd ${{ secrets.DEPLOY_DIR }}
+            docker-compose -f docker-compose.prod.yml down || true
+            docker-compose -f docker-compose.prod.yml pull || true
+            docker-compose -f docker-compose.prod.yml up -d --build
+            sleep 10
+            docker-compose -f docker-compose.prod.yml ps
+
+            echo '✅ Деплой через Docker Compose завершен!'
+            echo 'Приложение доступно по адресу: http://${{ secrets.VPS_HOST }}'
+          "

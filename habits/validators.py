@@ -6,9 +6,7 @@ def validate_execution_time(value):
     if value > 120:
         raise ValidationError("Время выполнения должно быть не больше 120 секунд")
     if value < 1:
-        raise ValidationError(
-            'Время выполнения должно быть не меньше 1 секунды'
-        )
+        raise ValidationError("Время выполнения должно быть не меньше 1 секунды")
 
 
 def validate_related_habit_is_pleasant(related_habit):
